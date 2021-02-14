@@ -1,7 +1,7 @@
 ﻿using CleanStrike.Interfaces;
 using CleanStrike.Models;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace CleanStrike
 {
@@ -10,7 +10,9 @@ namespace CleanStrike
         private CarromBoard _carromBoard;
         private Player _player1;
         private Player _player2;
-        private Player _striker;
+        private Player _currentPlayer;
+
+        private Queue<Player> _playerQueue = new Queue<Player>();
 
         private int _foulCounter = 0;
         private int _noStrikeCounter = 0;
@@ -24,22 +26,16 @@ namespace CleanStrike
 
         public void Start()
         {
-            if (_player1.IsPlayTurn)
-            {
-                _striker = _player1;
-                _player1.ChnageTurn();
-                _player2.ChnageTurn();
-            }
-            else
-            {
-                _striker = _player2;
-                _player1.ChnageTurn();
-                _player2.ChnageTurn();
-            }
+            _playerQueue.Enqueue(_player1);
+            _playerQueue.Enqueue(_player2);
+
+            var player = _playerQueue.Dequeue();
+            _currentPlayer = player;
+            _playerQueue.Enqueue(player);
         }
         public void RegisterScore(int score)
         {
-            _striker.Score += score;
+            _currentPlayer.Score += score;
         }
 
         public void CoinStriked()
@@ -62,17 +58,29 @@ namespace CleanStrike
 
         public bool IsConsecutiveNoStrike()
         {
-            if(_noStrikeCounter == 3)
+            var playingHistory = _currentPlayer.StrikeHistory;
+            bool isThreeNoStrikes = false;
+            int count = playingHistory.Count;
+            int index = (count - KeyStore.GameSettings.Consecutive_No_Strike_Limit);
+
+            if (count >= KeyStore.GameSettings.Consecutive_No_Strike_Limit)
             {
-                _noStrikeCounter = 0;
-                return true;
+                isThreeNoStrikes = true;
+                for (; index < count; index++)
+                {
+                    if (!(playingHistory[index] == StrikeType.No_Strike))
+                    {
+                        isThreeNoStrikes = false;
+                        break;
+                    }
+                }
             }
-            return false;
+            return isThreeNoStrikes;
         }
 
         public bool IsFoul()
         {
-            var playingHistory = _striker.StrikeHistory;
+            var playingHistory = _currentPlayer.StrikeHistory;
             bool isFoul = false;
             int count = playingHistory.Count;
             int index = (count - KeyStore.GameSettings.Consecutive_Loosing_Limit);
@@ -123,7 +131,7 @@ namespace CleanStrike
 
         public void RegisterMove(StrikeType move)
         {
-            _striker.StrikeHistory.Add(move);
+            _currentPlayer.StrikeHistory.Add(move);
 
             RegisterScore((int)move);
 
@@ -141,18 +149,8 @@ namespace CleanStrike
 
         public void SwitchPlayer()
         {
-            if (_player1.IsPlayTurn)
-            {
-                _striker = _player1;
-                _player1.ChnageTurn();
-                _player2.ChnageTurn();
-            }
-            else
-            {
-                _striker = _player2;
-                _player1.ChnageTurn();
-                _player2.ChnageTurn();
-            }
+            _currentPlayer = _playerQueue.Dequeue();
+            _playerQueue.Enqueue(_currentPlayer);
         }
 
         public void RedCoinStriked()
@@ -175,7 +173,7 @@ namespace CleanStrike
 
             do
             {
-                Console.WriteLine(_striker.Name + " Choose from the list");
+                Console.WriteLine(_currentPlayer.Name + " Choose from the list");
                 Console.WriteLine("1. STRIKE");
                 Console.WriteLine("2. MultiSTRIKE");
                 Console.WriteLine("3. Red STRIKE");
