@@ -1,4 +1,5 @@
-﻿using CleanStrike.Interfaces;
+﻿using CleanStrike.Exceptions;
+using CleanStrike.Interfaces;
 using CleanStrike.Models;
 using System;
 using System.Collections.Generic;
@@ -45,7 +46,7 @@ namespace CleanStrike
             else if (_carromBoard.RedCoins.Count != 0)
                 _carromBoard.RedCoins.Count--;
             else
-                throw new Exception();  //TODO: Write Custom Exceptions
+                throw new NoCoinException(); 
         }
 
         public Player GetWinner()
@@ -158,7 +159,7 @@ namespace CleanStrike
             if (_carromBoard.RedCoins.Count != 0)
                 _carromBoard.RedCoins.Count--;
             else
-                throw new Exception();  //TODO: Write Custom Exceptions
+                throw new NoCoinException();
         }
 
         public void StrikerStriked()
