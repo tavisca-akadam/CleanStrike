@@ -9,7 +9,6 @@ namespace CleanStrike.App
         {
             Game game = new Game(9, 1);
 
-            game.Print();
 
             game.PlayGame();
         }

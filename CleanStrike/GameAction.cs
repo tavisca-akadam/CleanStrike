@@ -10,10 +10,7 @@ namespace CleanStrike
     public class GameAction : IAction
     {
         public List<StrikeType> gameHistory;
-        public GameAction()
-        {
-            gameHistory = new List<StrikeType>();
-        }
+        public GameAction() => gameHistory = new List<StrikeType>();
 
         public bool CheckConsecutiveNoStrike(Player player)
         {
@@ -83,10 +80,8 @@ namespace CleanStrike
             gameHistory.Add(strikeType);
         }
 
-        public void AddPoints(Player player, int points)
-        {
-            player.Score += points;
-        }
+        public void AddPoints(Player player, int points) => player.Score += points;
+
         #region Private Methods
         private static bool IsLoosingPoint(StrikeType strikeType)
         {
