@@ -14,40 +14,19 @@ namespace CleanStrike
         private Player _currentPlayer;
 
         private Queue<Player> _playerQueue = new Queue<Player>();
-
+        private IAction _action;
         private int _foulCounter = 0;
         private int _noStrikeCounter = 0;
-        public Game()
+        public Game(int blackCoins, int redCoins)
         {
-            _carromBoard = new CarromBoard();
+            _carromBoard = new CarromBoard(blackCoins, redCoins);
             _player1 = new Player("Anil", true);
             _player2 = new Player("Ak", false);
-            Start();
+            _action = new GameAction();
+            InitBoard();
         }
 
-        public void Start()
-        {
-            _playerQueue.Enqueue(_player1);
-            _playerQueue.Enqueue(_player2);
 
-            var player = _playerQueue.Dequeue();
-            _currentPlayer = player;
-            _playerQueue.Enqueue(player);
-        }
-        public void RegisterScore(int score)
-        {
-            _currentPlayer.Score += score;
-        }
-
-        public void CoinStriked()
-        {
-            if (_carromBoard.BlackCoins.Count != 0)
-                _carromBoard.BlackCoins.Count--;
-            else if (_carromBoard.RedCoins.Count != 0)
-                _carromBoard.RedCoins.Count--;
-            else
-                throw new NoCoinException(); 
-        }
 
         public Player GetWinner()
         {
@@ -57,49 +36,7 @@ namespace CleanStrike
             return null;
         }
 
-        public bool IsConsecutiveNoStrike()
-        {
-            var playingHistory = _currentPlayer.StrikeHistory;
-            bool isThreeNoStrikes = false;
-            int count = playingHistory.Count;
-            int index = (count - KeyStore.GameSettings.Consecutive_No_Strike_Limit);
-
-            if (count >= KeyStore.GameSettings.Consecutive_No_Strike_Limit)
-            {
-                isThreeNoStrikes = true;
-                for (; index < count; index++)
-                {
-                    if (!(playingHistory[index] == StrikeType.No_Strike))
-                    {
-                        isThreeNoStrikes = false;
-                        break;
-                    }
-                }
-            }
-            return isThreeNoStrikes;
-        }
-
-        public bool IsFoul()
-        {
-            var playingHistory = _currentPlayer.StrikeHistory;
-            bool isFoul = false;
-            int count = playingHistory.Count;
-            int index = (count - KeyStore.GameSettings.Consecutive_Loosing_Limit);
-
-            if (count >= KeyStore.GameSettings.Consecutive_Loosing_Limit)
-            {
-                isFoul = true;
-                for(; index < count; index++)
-                {
-                    if (!IsLoosingPoint(playingHistory[index]))
-                    {
-                        isFoul = false;
-                        break;
-                    }
-                }
-            }
-            return isFoul;
-        }
+     
 
         public bool IsGameDraw()
         {
@@ -111,42 +48,22 @@ namespace CleanStrike
             return false;
         }
 
-        bool IsLoosingPoint(StrikeType strikeType)
-        {
-            return ((strikeType == StrikeType.Consecutive_3_NoStrike) || (strikeType == StrikeType.Defunt_Coin) ||
-                (strikeType == StrikeType.Striker_Strike));
-        }
+
 
         public bool IsGameOver()
         {
-            return (_carromBoard.BlackCoins.Count == 0 && _carromBoard.RedCoins.Count == 0);
+            return (_carromBoard.BlackCoins == 0 && _carromBoard.RedCoins == 0);
         }
 
         public void Print()
         {
-            Console.WriteLine($"Total black coins remaining : {_carromBoard.BlackCoins.Count}.");
-            Console.WriteLine($"Total Red coins remaining : {_carromBoard.RedCoins.Count}.");
+            Console.WriteLine($"Total black coins remaining : {_carromBoard.BlackCoins}.");
+            Console.WriteLine($"Total Red coins remaining : {_carromBoard.RedCoins}.");
             Console.WriteLine($"Player 1: {_player1.Name }'s score  : {_player1.Score}.");
             Console.WriteLine($"Player 2: {_player2.Name }'s score  : {_player2.Score}.");
         }
 
-        public void RegisterMove(StrikeType move)
-        {
-            _currentPlayer.StrikeHistory.Add(move);
-
-            RegisterScore((int)move);
-
-            if (move == StrikeType.Defunt_Coin || move == StrikeType.Striker_Strike)
-                _foulCounter++;
-            else if(move == StrikeType.No_Strike)
-                _noStrikeCounter++;
-            else
-            {
-                _foulCounter = 0;
-                _noStrikeCounter = 0;
-            }
-
-        }
+ 
 
         public void SwitchPlayer()
         {
@@ -154,20 +71,10 @@ namespace CleanStrike
             _playerQueue.Enqueue(_currentPlayer);
         }
 
-        public void RedCoinStriked()
-        {
-            if (_carromBoard.RedCoins.Count != 0)
-                _carromBoard.RedCoins.Count--;
-            else
-                throw new NoCoinException();
-        }
 
-        public void StrikerStriked()
-        {
-            throw new NotImplementedException();
-        }
 
-        public void Play()
+
+        public void PlayGame()
         {
             int caseType = -1;
 
@@ -186,10 +93,10 @@ namespace CleanStrike
                 caseType = Convert.ToInt32(Console.ReadLine());
                 Register(caseType);
 
-                if (IsFoul())
-                    RegisterScore((int)StrikeType.Foul);
-                if (IsConsecutiveNoStrike())
-                    RegisterScore((int)StrikeType.Consecutive_3_NoStrike);
+                if (_action.CheckFoul(_currentPlayer))
+                    _action.AddPoints(_currentPlayer, (int)StrikeType.Foul);
+                if (_action.CheckConsecutiveNoStrike(_currentPlayer))
+                    _action.AddPoints(_currentPlayer, (int)StrikeType.Consecutive_3_NoStrike);
 
                 if (GetWinner() != null)
                     caseType = 7;
@@ -231,34 +138,53 @@ namespace CleanStrike
             switch (strikeType)
             {
                 case StrikeType.No_Strike:
-                    RegisterMove(strikeType);
+                    _action.RegisterAction(_currentPlayer, strikeType);
                     SwitchPlayer();
                     break;
                 case StrikeType.Striker_Strike:
-                    RegisterMove(strikeType);
+                    _action.RegisterAction(_currentPlayer, strikeType);
+                    _action.AddPoints(_currentPlayer, (int)strikeType);
                     SwitchPlayer();
                     break;
                 case StrikeType.RedCoin_Strike:
-                    RegisterMove(strikeType);
-                    RedCoinStriked();
+                    _action.RegisterAction(_currentPlayer, strikeType);
+                    _action.AddPoints(_currentPlayer, (int)strikeType);
+                    _action.OnRedCoinPocketed(_carromBoard);
                     SwitchPlayer();
                     break;
                 case StrikeType.Strike:
-                    RegisterMove(strikeType);
+                    _action.RegisterAction(_currentPlayer, strikeType);
+                    _action.AddPoints(_currentPlayer, (int)strikeType);
                     SwitchPlayer();
                     break;
                 case StrikeType.Multi_Strike:
-                    RegisterMove(strikeType);
+                    _action.RegisterAction(_currentPlayer, strikeType);
+                    _action.AddPoints(_currentPlayer, (int)strikeType);
                     SwitchPlayer();
                     break;
                 case StrikeType.Defunt_Coin:
-                    RegisterMove(strikeType);
-                    CoinStriked();
+                    _action.RegisterAction(_currentPlayer, strikeType);
+                    _action.AddPoints(_currentPlayer, (int)strikeType);
+                    _action.OnCoinStriked(_carromBoard);
                     SwitchPlayer();
                     break;
+                
             }
 
             
         }
+
+        public void InitBoard()
+        {
+            _playerQueue.Enqueue(_player2);
+            _playerQueue.Enqueue(_player1);
+            _currentPlayer = _player1;
+        }
+
+        public void AddPlayer(Player player)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

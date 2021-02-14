@@ -9,6 +9,7 @@ namespace CleanStrike.Models
         public static class Default
         {
             public static readonly int BlackCoins = 9;
+            public static readonly int RedCoins = 1;
         }
 
         public static class GameSettings
