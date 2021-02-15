@@ -1,4 +1,5 @@
-﻿using CleanStrike.Interfaces;
+﻿using CleanStrike.Exceptions;
+using CleanStrike.Interfaces;
 using CleanStrike.Models;
 using System;
 using System.Collections.Generic;
@@ -30,11 +31,6 @@ namespace CleanStrike
             _playerQueues.Enqueue(_player2);
             _playerQueues.Enqueue(_player1);
             _currentPlayer = _player1;
-        }
-
-        public void AddPlayer(Player player)
-        {
-            throw new NotImplementedException();
         }
 
         public Player GetWinner()
@@ -69,7 +65,8 @@ namespace CleanStrike
                 Console.WriteLine($"{winner.Name} won the game. Final Score: {_player1.Score}-{_player2.Score}.");
                 return;
             }
-            Console.WriteLine("Match Draw...");
+            Console.WriteLine($"Current Score: {_player1.Score}-{_player2.Score}.");
+            Console.WriteLine($"Coins Status: [B: {_carromBoard.BlackCoins}] [R:{_carromBoard.RedCoins}].");
         }
 
         public void SwitchPlayer()
@@ -78,67 +75,39 @@ namespace CleanStrike
             _playerQueues.Enqueue(_currentPlayer);
         }
 
-        public void PlayGame()
+        public void PlayGame(int strikeType)
         {
-            int caseType = -1;
+               
+                switch (strikeType)
+                {  
+                    case 1:
+                        PassStriker(StrikeType.Strike);
+                        break;
+                    case 2:
+                        PassStriker(StrikeType.Multi_Strike);
+                        break;
+                    case 3:
+                        PassStriker(StrikeType.RedCoin_Strike);
+                        _action.OnRedCoinPocketed(_carromBoard);
+                        break;
+                    case 4:
+                        PassStriker(StrikeType.Striker_Strike);
+                        break;
+                    case 5:
+                        PassStriker(StrikeType.Defunt_Coin);
+                        _action.OnCoinStriked(_carromBoard);
+                        break;
+                    case 6:
+                        _action.RegisterAction(_currentPlayer, StrikeType.No_Strike);
+                        SwitchPlayer();
+                        break;
 
-
-            do
-            {
-                Console.WriteLine(_currentPlayer.Name + " Choose from the list");
-                Console.WriteLine("1. STRIKE");
-                Console.WriteLine("2. MultiSTRIKE");
-                Console.WriteLine("3. Red STRIKE");
-                Console.WriteLine("4. Striker STRIKE");
-                Console.WriteLine("5. Defunct Coin");
-                Console.WriteLine("6. None");
-                Console.WriteLine("7. Exit");
-
-                caseType = Convert.ToInt32(Console.ReadLine());
-                Options((StrikeType)caseType);
-
+                }
                 if (_action.CheckFoul(_currentPlayer))
                     _action.AddPoints(_currentPlayer, (int)StrikeType.Foul);
                 if (_action.CheckConsecutiveNoStrike(_currentPlayer))
                     _action.AddPoints(_currentPlayer, (int)StrikeType.Consecutive_3_NoStrike);
-
-                if (GetWinner() != null)
-                    caseType = 7;
-
-            } while (!(IsGameOver() || caseType == 7));
-            if (IsGameDraw())
-                Console.WriteLine("Game DRAW!!...");
             PrintScore();
-        }
-
-        private void Options(StrikeType strikeType)
-        {
-            switch (strikeType)
-            {
-                case StrikeType.No_Strike:
-                    _action.RegisterAction(_currentPlayer, strikeType);
-                    SwitchPlayer();
-                    break;
-                case StrikeType.Striker_Strike:
-                    PassStriker(strikeType);
-                    break;
-                case StrikeType.RedCoin_Strike:
-                    PassStriker(strikeType);
-                    _action.OnRedCoinPocketed(_carromBoard);
-                    break;
-                case StrikeType.Strike:
-                    PassStriker(strikeType);
-                    break;
-                case StrikeType.Multi_Strike:
-                    PassStriker(strikeType);
-                    break;
-                case StrikeType.Defunt_Coin:
-                    PassStriker(strikeType);
-                    _action.OnCoinStriked(_carromBoard);
-                    break;
-                
-            }
-            
         }
 
         private void PassStriker(StrikeType strikeType)

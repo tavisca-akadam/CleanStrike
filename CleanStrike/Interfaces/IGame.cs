@@ -11,9 +11,6 @@ namespace CleanStrike.Interfaces
         bool IsGameDraw();
         bool IsGameOver();
         void SwitchPlayer();
-
-        void InitBoard();
-        void AddPlayer(Player player);
-        void PlayGame();
+        void PlayGame(int strike);
       }
 }

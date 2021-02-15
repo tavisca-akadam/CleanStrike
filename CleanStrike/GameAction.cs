@@ -63,7 +63,7 @@ namespace CleanStrike
             else if (board.RedCoins != 0)
                 board.RedCoins--;
             else
-                throw new NoCoinException();
+                throw new CoinNotFoundException();
         }
 
         public void OnRedCoinPocketed(CarromBoard board)
@@ -71,7 +71,7 @@ namespace CleanStrike
             if (board.RedCoins != 0)
                 board.RedCoins--;
             else
-                throw new NoCoinException();
+                throw new CoinNotFoundException();
         }
 
         public void RegisterAction(Player player, StrikeType strikeType)

@@ -5,9 +5,9 @@ using System.Text;
 namespace CleanStrike.Exceptions
 {
     [Serializable]
-    public class NoCoinException : Exception
+    public class CoinNotFoundException : Exception
     {
-        public NoCoinException()
+        public CoinNotFoundException()
         {
 
         }
