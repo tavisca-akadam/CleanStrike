@@ -24,7 +24,7 @@ namespace CleanStrike.Tests
             GameAction gameAction = new GameAction();
             Player player = new Player("p1");
 
-            gameAction.AddPoints(player, (int)strikeType);
+            gameAction.AddPoints(player, ScoreMap.AssignedScore[strikeType]);
             player.Score.Should().Be(expectedPoints);
         }
 
@@ -34,10 +34,10 @@ namespace CleanStrike.Tests
             GameAction gameAction = new GameAction();
             Player player = new Player("p1");
 
-            gameAction.AddPoints(player, (int)StrikeType.RedCoin_Strike);
-            gameAction.AddPoints(player, (int)StrikeType.Multi_Strike);
-            gameAction.AddPoints(player, (int)StrikeType.Strike);
-            gameAction.AddPoints(player, (int)StrikeType.Defunt_Coin);
+            gameAction.AddPoints(player, ScoreMap.AssignedScore[StrikeType.RedCoin_Strike]);
+            gameAction.AddPoints(player, ScoreMap.AssignedScore[StrikeType.Multi_Strike]);
+            gameAction.AddPoints(player, ScoreMap.AssignedScore[StrikeType.Strike]);
+            gameAction.AddPoints(player, ScoreMap.AssignedScore[StrikeType.Defunt_Coin]);
 
             player.Score.Should().Be(4);
         }
@@ -73,6 +73,7 @@ namespace CleanStrike.Tests
 
             player.StrikeHistory.Count.Should().Be(4);
             player.StrikeHistory.First().Should().Be(StrikeType.RedCoin_Strike);
+            player.StrikeHistory.Last().Should().Be(StrikeType.Defunt_Coin);
         }
 
         [Fact]

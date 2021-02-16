@@ -37,7 +37,6 @@ namespace CleanStrike
                 if(IsPlayerWinner(itr))
                     return _players[itr];
             }
-
             return null;
         }
 
@@ -94,20 +93,20 @@ namespace CleanStrike
                 switch (strikeType)
                 {  
                     case 1:
-                        PassStriker(StrikeType.Strike, ScoreMap.assignedScore[StrikeType.Strike]);
+                        PassStriker(StrikeType.Strike, ScoreMap.AssignedScore[StrikeType.Strike]);
                         break;
                     case 2:
-                        PassStriker(StrikeType.Multi_Strike, ScoreMap.assignedScore[StrikeType.Multi_Strike]);
+                        PassStriker(StrikeType.Multi_Strike, ScoreMap.AssignedScore[StrikeType.Multi_Strike]);
                         break;
                     case 3:
-                        PassStriker(StrikeType.RedCoin_Strike, ScoreMap.assignedScore[StrikeType.RedCoin_Strike]);
+                        PassStriker(StrikeType.RedCoin_Strike, ScoreMap.AssignedScore[StrikeType.RedCoin_Strike]);
                         _action.OnRedCoinPocketed(_carromBoard);
                         break;
                     case 4:
-                        PassStriker(StrikeType.Striker_Strike, ScoreMap.assignedScore[StrikeType.Striker_Strike]);
+                        PassStriker(StrikeType.Striker_Strike, ScoreMap.AssignedScore[StrikeType.Striker_Strike]);
                         break;
                     case 5:
-                        PassStriker(StrikeType.Defunt_Coin, ScoreMap.assignedScore[StrikeType.Defunt_Coin]);
+                        PassStriker(StrikeType.Defunt_Coin, ScoreMap.AssignedScore[StrikeType.Defunt_Coin]);
                         _action.OnCoinStriked(_carromBoard);
                         break;
                     case 6:
@@ -117,9 +116,9 @@ namespace CleanStrike
 
                 }
                 if (_action.CheckFoul(_players[_currentPlayerIndex]))
-                    _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.assignedScore[StrikeType.Foul]);
+                    _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.AssignedScore[StrikeType.Foul]);
                 if (_action.CheckConsecutiveNoStrike(_players[_currentPlayerIndex]))
-                    _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.assignedScore[StrikeType.Consecutive_3_NoStrike]);
+                    _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.AssignedScore[StrikeType.Consecutive_3_NoStrike]);
         }
 
         #region private methods
