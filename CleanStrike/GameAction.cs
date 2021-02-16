@@ -9,9 +9,15 @@ namespace CleanStrike
 {
     public class GameAction : IAction
     {
+        /*
+         * To maintain the Game playing history
+         **/
         public List<StrikeType> gameHistory;
         public GameAction() => gameHistory = new List<StrikeType>();
 
+        /**
+         * Helper Method to check if consecutive three no strike move played by same player.
+         **/
         public bool CheckConsecutiveNoStrike(Player player)
         {
             var playingHistory = player.StrikeHistory;
@@ -22,7 +28,7 @@ namespace CleanStrike
             if (count >= KeyStore.GameSettings.Consecutive_No_Strike_Limit)
             {
                 isConsecutive3NoStrikes = true;
-                while(index < count)
+                while (index < count)
                 {
                     if (!(playingHistory[index] == StrikeType.No_Strike))
                     {
@@ -35,6 +41,9 @@ namespace CleanStrike
             return isConsecutive3NoStrikes;
         }
 
+        /**
+         * Helper method check whether Foul or not.
+         **/
         public bool CheckFoul(Player player)
         {
             var playingHistory = player.StrikeHistory;
@@ -44,11 +53,11 @@ namespace CleanStrike
 
             if (count >= KeyStore.GameSettings.Consecutive_Loosing_Limit)
             {
-                bool is3NoStrike = CheckConsecutiveNoStrike(player);
+                bool isThreeNoStrike = CheckConsecutiveNoStrike(player);
                 isFoul = true;
                 while (index < count)
                 {
-                    if (!(IsLoosingPoint(playingHistory[index]) || is3NoStrike))
+                    if (!(IsLoosingPoint(playingHistory[index]) || isThreeNoStrike))
                     {
                         isFoul = false;
                         break;
@@ -59,6 +68,9 @@ namespace CleanStrike
             return isFoul;
         }
 
+        /**
+         * Helper method to decrement coin count when condition met.
+         **/
         public void OnCoinStriked(CarromBoard board)
         {
             if (board.BlackCoins != 0)
@@ -69,6 +81,9 @@ namespace CleanStrike
                 throw new CoinNotFoundException();
         }
 
+        /**
+         * Helper method to decrement red coin count when condition met.
+         **/
         public void OnRedCoinPocketed(CarromBoard board)
         {
             if (board.RedCoins != 0)
@@ -77,21 +92,29 @@ namespace CleanStrike
                 throw new CoinNotFoundException();
         }
 
+        /**
+         * Method Register move for given player.
+         **/
         public void RegisterAction(Player player, StrikeType strikeType)
         {
             player.StrikeHistory.Add(strikeType);
             gameHistory.Add(strikeType);
         }
-
+        
+        /**
+         * Method increase/decrease player's score.
+         **/
         public void AddPoints(Player player, int points) => player.Score += points;
 
         #region Private Methods
+        /**
+         *  Method decides given move (strikeType) has loosing point.
+         **/
         private static bool IsLoosingPoint(StrikeType strikeType)
         {
             return ((strikeType == StrikeType.Defunt_Coin) ||
                 (strikeType == StrikeType.Striker_Strike));
         }
-
         #endregion
     }
 }

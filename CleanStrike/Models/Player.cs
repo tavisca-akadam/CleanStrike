@@ -7,6 +7,9 @@ namespace CleanStrike.Models
 {
     public class Player
     {
+        /**
+         * Model Class representing single player.
+         **/
         public Player(string name)
         {
             Name = name;

@@ -5,6 +5,10 @@ using System.Text;
 
 namespace CleanStrike.Interfaces
 {
+    /**
+     * It provides the all action will performs while playing game.
+     **/
+
     public interface IAction
     {
         void RegisterAction(Player player, StrikeType strikeType);

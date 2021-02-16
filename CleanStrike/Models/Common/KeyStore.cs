@@ -4,6 +4,10 @@ using System.Text;
 
 namespace CleanStrike.Models
 {
+    /**
+     * Model Class represent Common setting will used in Game.
+     **/
+
     public class KeyStore
     {
         public static class Default

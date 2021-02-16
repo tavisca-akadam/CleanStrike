@@ -6,6 +6,10 @@ namespace CleanStrike.Models
 {
     public class CarromBoard
     {
+        /**
+         * Model Class representing Carrom board which used while playing game
+         **/
+
         public CarromBoard()
         {
 

@@ -5,20 +5,23 @@ using System.Reflection;
 
 namespace CleanStrike.App
 {
-    class Program
+    public class GameController
     {
         static void Main(string[] args)
         {
             try 
             {
-                var inputStraem = ReadInputFromFile();
+                var inputStraem = ReadInputFromFile();      //Reading from file.
                 int itr = 0;
-                var inputArr = inputStraem.Split(',');
+                var inputArr = inputStraem.Split(',');      //Spliting file input.
 
                 Game game = new Game(9, 1);
                 int option = 7;
-                do
+                while(true)
                 {
+                    if (itr >= inputArr.Length)
+                        break;
+
                     option = Convert.ToInt32(inputArr[itr++]);
                     if (option >= 7)
                         break;
@@ -27,9 +30,14 @@ namespace CleanStrike.App
 
                     if (game.GetWinner() != null)
                         break;
-                    
-                } while (!(game.IsGameOver() || option >= 7));
-                
+                    if (game.IsGameOver())
+                    {
+                        Console.WriteLine("Game Over...");
+                        break;
+                    }
+                }
+
+
                 game.PrintScore();
             }
             catch(Exception ex) 
@@ -38,19 +46,21 @@ namespace CleanStrike.App
             }
         }
         
-        public static string ReadInputFromFile()
+        /**
+         * Method will use to read user input from file.
+         **/
+        static string ReadInputFromFile()
         {
             var assembly = Assembly.GetExecutingAssembly();
 
             var streamReader = new StreamReader(assembly.GetManifestResourceStream(KeyStore.Program.FilePath));
             if (streamReader != null)
             {
-                var text1 = streamReader.ReadLine(); //TODO: Need to change read score by score
+                var text1 = streamReader.ReadLine();
                 return text1;
             }
 
             return string.Empty;
-        }
-        
+        }      
     }
 }

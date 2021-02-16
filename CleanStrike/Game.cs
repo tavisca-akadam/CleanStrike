@@ -28,6 +28,9 @@ namespace CleanStrike
             _action = new GameAction();
         }
 
+        /*
+         * Helper method to return game final winner of game.
+         **/
         public Player GetWinner()
         {
             for(int itr = 0; itr < _players.Count; itr++) {
@@ -38,18 +41,9 @@ namespace CleanStrike
             return null;
         }
 
-        //Method that decides if player winner from player list
-        private bool IsPlayerWinner(int index) {
-            if(_players[index].Score < KeyStore.GameSettings.Min_Winining_Points)
-                return false;
-            for(int itr = 0; itr < _players.Count; itr++) {
-                if(index != itr) {
-                    if(_players[index].Score - _players[itr].Score < KeyStore.GameSettings.Min_Win_Point_Diff)
-                        return false;
-                }
-            }
-            return true;
-        }
+        /*
+         * Helper method to return game is draw or not.
+         **/
         public bool IsGameDraw()
         {
             if(IsGameOver())
@@ -60,27 +54,41 @@ namespace CleanStrike
             return false;
         }
 
+        /*
+         * Helper method to return game is over or not.
+         **/
         public bool IsGameOver() => (_carromBoard.BlackCoins == 0 && _carromBoard.RedCoins == 0);
 
+        /*
+         * Helper Method to printing the scores of players.
+         **/
         public void PrintScore()
         {
             Player winner = GetWinner();
-            if(winner != null)
+            if (winner != null)
             {
-                Console.WriteLine($"{winner.Name} won the game.");
-                Console.WriteLine("Final Score:");
-                for(int itr = 0; itr < _players.Count; itr++) {
-                    Console.Write($"{_players[itr].Score}");
-                }
+                Console.Write($"{winner.Name} won the game. ");
             }
+            Console.WriteLine("Final Score:");
+            for (int itr = 0; itr < _players.Count; itr++)
+            {
+                Console.WriteLine($"{_players[itr].Name} : {_players[itr].Score}.");
+            } 
         }
 
+        /**
+         * Helper method for switching player's turn
+         **/
         public void SwitchPlayer()
         {
             _currentPlayerIndex++;
             _currentPlayerIndex %= _players.Count;
         }
 
+        /**
+         * Entry Method
+         * Decides game movement using player's move(strikeType).
+         **/
         public void PlayGame(int strikeType)
         {
                 switch (strikeType)
@@ -109,17 +117,32 @@ namespace CleanStrike
 
                 }
                 if (_action.CheckFoul(_players[_currentPlayerIndex]))
-                    _action.AddPoints(_players[_currentPlayerIndex], (int)StrikeType.Foul);
+                    _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.assignedScore[StrikeType.Foul]);
                 if (_action.CheckConsecutiveNoStrike(_players[_currentPlayerIndex]))
-                    _action.AddPoints(_players[_currentPlayerIndex], (int)StrikeType.Consecutive_3_NoStrike);
-            PrintScore();
+                    _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.assignedScore[StrikeType.Consecutive_3_NoStrike]);
         }
 
+        #region private methods
+        // This method will register the move and pass the striker to next player.
         private void PassStriker(StrikeType strikeType, int value)
         {
             _action.RegisterAction(_players[_currentPlayerIndex], strikeType);
             _action.AddPoints(_players[_currentPlayerIndex], value);
             SwitchPlayer();
         }
+
+        //Method that decides if player is winner from player list
+        private bool IsPlayerWinner(int index) {
+            if(_players[index].Score < KeyStore.GameSettings.Min_Winining_Points)
+                return false;
+            for(int itr = 0; itr < _players.Count; itr++) {
+                if(index != itr) {
+                    if(_players[index].Score - _players[itr].Score < KeyStore.GameSettings.Min_Win_Point_Diff)
+                        return false;
+                }
+            }
+            return true;
+        }
+        #endregion
     }
 }
