@@ -22,13 +22,14 @@ namespace CleanStrike
             if (count >= KeyStore.GameSettings.Consecutive_No_Strike_Limit)
             {
                 isConsecutive3NoStrikes = true;
-                for (; index < count; index++)
+                while(index < count)
                 {
                     if (!(playingHistory[index] == StrikeType.No_Strike))
                     {
                         isConsecutive3NoStrikes = false;
                         break;
                     }
+                    index++;
                 }
             }
             return isConsecutive3NoStrikes;
@@ -43,14 +44,16 @@ namespace CleanStrike
 
             if (count >= KeyStore.GameSettings.Consecutive_Loosing_Limit)
             {
+                bool is3NoStrike = CheckConsecutiveNoStrike(player);
                 isFoul = true;
-                for (; index < count; index++)
+                while (index < count)
                 {
-                    if (!IsLoosingPoint(playingHistory[index]))
+                    if (!(IsLoosingPoint(playingHistory[index]) || is3NoStrike))
                     {
                         isFoul = false;
                         break;
                     }
+                    index++;
                 }
             }
             return isFoul;
@@ -85,7 +88,7 @@ namespace CleanStrike
         #region Private Methods
         private static bool IsLoosingPoint(StrikeType strikeType)
         {
-            return ((strikeType == StrikeType.Consecutive_3_NoStrike) || (strikeType == StrikeType.Defunt_Coin) ||
+            return ((strikeType == StrikeType.Defunt_Coin) ||
                 (strikeType == StrikeType.Striker_Strike));
         }
 

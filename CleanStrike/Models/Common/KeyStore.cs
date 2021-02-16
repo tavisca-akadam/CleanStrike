@@ -19,5 +19,9 @@ namespace CleanStrike.Models
             public static readonly int Min_Winining_Points = 5;
             public static readonly int Min_Win_Point_Diff = 3;
         }
+        public static class Program 
+        {
+            public static readonly string FilePath = "CleanStrike.App.Input.input.txt";
+        }
     }
 }

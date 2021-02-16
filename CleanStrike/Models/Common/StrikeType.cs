@@ -9,13 +9,13 @@ namespace CleanStrike.Models
     {
         //TODO: Add Description
         [Description("")]
-        Strike = 1,
-        Multi_Strike = 2,
-        RedCoin_Strike = 3,
-        Striker_Strike = -1,
-        Defunt_Coin = -2,
-        No_Strike = 0,
-        Foul = -1,
-        Consecutive_3_NoStrike = -1
+        Strike,
+        Multi_Strike,
+        RedCoin_Strike,
+        Striker_Strike,
+        Defunt_Coin,
+        No_Strike,
+        Foul,
+        Consecutive_3_NoStrike
     }
 }
