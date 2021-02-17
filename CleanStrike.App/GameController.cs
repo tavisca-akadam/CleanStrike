@@ -40,6 +40,10 @@ namespace CleanStrike.App
 
                 game.PrintScore();
             }
+            catch(FileNotFoundException ex)
+            {
+                Console.WriteLine("Something went wrong. Play Terminated.");
+            }
             catch(Exception ex) 
             {
                 Console.WriteLine("Invalid input. Play Terminated.");
@@ -52,12 +56,19 @@ namespace CleanStrike.App
         static string ReadInputFromFile()
         {
             var assembly = Assembly.GetExecutingAssembly();
-
-            var streamReader = new StreamReader(assembly.GetManifestResourceStream(KeyStore.Program.FilePath));
-            if (streamReader != null)
+            try
             {
-                var text1 = streamReader.ReadLine();
-                return text1;
+                var streamReader = new StreamReader(assembly.GetManifestResourceStream(KeyStore.Program.FilePath));
+                if (streamReader != null)
+                {
+                    var text1 = streamReader.ReadLine();
+                    return text1;
+                }
+
+            }
+            catch(FileNotFoundException ex)
+            {
+                throw new FileNotFoundException();
             }
 
             return string.Empty;
