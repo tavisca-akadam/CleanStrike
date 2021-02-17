@@ -15,7 +15,6 @@ namespace CleanStrike.Tests
         [Fact]
         public void Check_game_is_draw_test()
         {
-            Player player = null;
             Game game = new Game(0, 0);
 
             game.IsGameDraw().Should().Be(true);
