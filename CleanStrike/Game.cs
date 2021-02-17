@@ -1,6 +1,8 @@
-﻿using CleanStrike.Interfaces;
+﻿using CleanStrike.Exceptions;
+using CleanStrike.Interfaces;
 using CleanStrike.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CleanStrike
@@ -8,90 +10,39 @@ namespace CleanStrike
     public class Game : IGame
     {
         private CarromBoard _carromBoard;
-        private Player _player1;
-        private Player _player2;
-        private Player _striker;
 
-        private int _foulCounter = 0;
-        private int _noStrikeCounter = 0;
-        public Game()
+        private List<Player> _players;
+
+        private int _currentPlayerIndex;
+        private IAction _action;
+
+        public Game(int blackCoins, int redCoins)
         {
-            _carromBoard = new CarromBoard();
-            _player1 = new Player("Anil", true);
-            _player2 = new Player("Ak", false);
-            Start();
+            _carromBoard = new CarromBoard(blackCoins, redCoins);
+            _players = new List<Player>();
+
+            _players.Add(new Player("Ak"));
+            _players.Add(new Player("Anil"));
+
+            _currentPlayerIndex = 0;
+            _action = new GameAction();
         }
 
-        public void Start()
-        {
-            if (_player1.IsPlayTurn)
-            {
-                _striker = _player1;
-                _player1.ChnageTurn();
-                _player2.ChnageTurn();
-            }
-            else
-            {
-                _striker = _player2;
-                _player1.ChnageTurn();
-                _player2.ChnageTurn();
-            }
-        }
-        public void RegisterScore(int score)
-        {
-            _striker.Score += score;
-        }
-
-        public void CoinStriked()
-        {
-            if (_carromBoard.BlackCoins.Count != 0)
-                _carromBoard.BlackCoins.Count--;
-            else if (_carromBoard.RedCoins.Count != 0)
-                _carromBoard.RedCoins.Count--;
-            else
-                throw new Exception();  //TODO: Write Custom Exceptions
-        }
-
+        /*
+         * Helper method to return game final winner of game.
+         **/
         public Player GetWinner()
         {
-            if (((_player1.Score >= KeyStore.GameSettings.Min_Winining_Points) || (_player2.Score >= KeyStore.GameSettings.Min_Winining_Points))
-                && Math.Abs(_player1.Score - _player2.Score) >= KeyStore.GameSettings.Min_Win_Point_Diff)
-                return _player1.Score > _player2.Score ? _player1 : _player2;
+            for(int itr = 0; itr < _players.Count; itr++) {
+                if(IsPlayerWinner(itr))
+                    return _players[itr];
+            }
             return null;
         }
 
-        public bool IsConsecutiveNoStrike()
-        {
-            if(_noStrikeCounter == 3)
-            {
-                _noStrikeCounter = 0;
-                return true;
-            }
-            return false;
-        }
-
-        public bool IsFoul()
-        {
-            var playingHistory = _striker.StrikeHistory;
-            bool isFoul = false;
-            int count = playingHistory.Count;
-            int index = (count - KeyStore.GameSettings.Consecutive_Loosing_Limit);
-
-            if (count >= KeyStore.GameSettings.Consecutive_Loosing_Limit)
-            {
-                isFoul = true;
-                for(; index < count; index++)
-                {
-                    if (!IsLoosingPoint(playingHistory[index]))
-                    {
-                        isFoul = false;
-                        break;
-                    }
-                }
-            }
-            return isFoul;
-        }
-
+        /*
+         * Helper method to return game is draw or not.
+         **/
         public bool IsGameDraw()
         {
             if(IsGameOver())
@@ -102,164 +53,95 @@ namespace CleanStrike
             return false;
         }
 
-        bool IsLoosingPoint(StrikeType strikeType)
+        /*
+         * Helper method to return game is over or not.
+         **/
+        public bool IsGameOver() => (_carromBoard.BlackCoins == 0 && _carromBoard.RedCoins == 0);
+
+        /*
+         * Helper Method to printing the scores of players.
+         **/
+        public void PrintScore()
         {
-            return ((strikeType == StrikeType.Consecutive_3_NoStrike) || (strikeType == StrikeType.Defunt_Coin) ||
-                (strikeType == StrikeType.Striker_Strike));
-        }
-
-        public bool IsGameOver()
-        {
-            return (_carromBoard.BlackCoins.Count == 0 && _carromBoard.RedCoins.Count == 0);
-        }
-
-        public void Print()
-        {
-            Console.WriteLine($"Total black coins remaining : {_carromBoard.BlackCoins.Count}.");
-            Console.WriteLine($"Total Red coins remaining : {_carromBoard.RedCoins.Count}.");
-            Console.WriteLine($"Player 1: {_player1.Name }'s score  : {_player1.Score}.");
-            Console.WriteLine($"Player 2: {_player2.Name }'s score  : {_player2.Score}.");
-        }
-
-        public void RegisterMove(StrikeType move)
-        {
-            _striker.StrikeHistory.Add(move);
-
-            RegisterScore((int)move);
-
-            if (move == StrikeType.Defunt_Coin || move == StrikeType.Striker_Strike)
-                _foulCounter++;
-            else if(move == StrikeType.No_Strike)
-                _noStrikeCounter++;
-            else
+            Player winner = GetWinner();
+            if (winner != null)
             {
-                _foulCounter = 0;
-                _noStrikeCounter = 0;
+                Console.Write($"{winner.Name} won the game. ");
             }
-
+            Console.WriteLine("Final Score:");
+            for (int itr = 0; itr < _players.Count; itr++)
+            {
+                Console.WriteLine($"{_players[itr].Name} : {_players[itr].Score}.");
+            } 
         }
 
+        /**
+         * Helper method for switching player's turn
+         **/
         public void SwitchPlayer()
         {
-            if (_player1.IsPlayTurn)
-            {
-                _striker = _player1;
-                _player1.ChnageTurn();
-                _player2.ChnageTurn();
+            _currentPlayerIndex++;
+            _currentPlayerIndex %= _players.Count;
+        }
+
+        /**
+         * Entry Method
+         * Decides game movement using player's move(strikeType).
+         **/
+        public void PlayGame(int strikeType)
+        {
+                switch (strikeType)
+                {  
+                    case 1:
+                        PassStriker(StrikeType.Strike, ScoreMap.AssignedScore[StrikeType.Strike]);
+                        break;
+                    case 2:
+                        PassStriker(StrikeType.Multi_Strike, ScoreMap.AssignedScore[StrikeType.Multi_Strike]);
+                        break;
+                    case 3:
+                        PassStriker(StrikeType.RedCoin_Strike, ScoreMap.AssignedScore[StrikeType.RedCoin_Strike]);
+                        _action.OnRedCoinPocketed(_carromBoard);
+                        break;
+                    case 4:
+                        PassStriker(StrikeType.Striker_Strike, ScoreMap.AssignedScore[StrikeType.Striker_Strike]);
+                        break;
+                    case 5:
+                        PassStriker(StrikeType.Defunt_Coin, ScoreMap.AssignedScore[StrikeType.Defunt_Coin]);
+                        _action.OnCoinStriked(_carromBoard);
+                        break;
+                    case 6:
+                        _action.RegisterAction(_players[_currentPlayerIndex], StrikeType.No_Strike);
+                        SwitchPlayer();
+                        break;
+
+                }
+                if (_action.CheckFoul(_players[_currentPlayerIndex]))
+                    _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.AssignedScore[StrikeType.Foul]);
+                if (_action.CheckConsecutiveNoStrike(_players[_currentPlayerIndex]))
+                    _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.AssignedScore[StrikeType.Consecutive_3_NoStrike]);
+        }
+
+        #region private methods
+        // This method will register the move and pass the striker to next player.
+        private void PassStriker(StrikeType strikeType, int value)
+        {
+            _action.RegisterAction(_players[_currentPlayerIndex], strikeType);
+            _action.AddPoints(_players[_currentPlayerIndex], value);
+            SwitchPlayer();
+        }
+
+        //Method that decides if player is winner from player list
+        private bool IsPlayerWinner(int index) {
+            if(_players[index].Score < KeyStore.GameSettings.Min_Winining_Points)
+                return false;
+            for(int itr = 0; itr < _players.Count; itr++) {
+                if(index != itr) {
+                    if(_players[index].Score - _players[itr].Score < KeyStore.GameSettings.Min_Win_Point_Diff)
+                        return false;
+                }
             }
-            else
-            {
-                _striker = _player2;
-                _player1.ChnageTurn();
-                _player2.ChnageTurn();
-            }
+            return true;
         }
-
-        public void RedCoinStriked()
-        {
-            if (_carromBoard.RedCoins.Count != 0)
-                _carromBoard.RedCoins.Count--;
-            else
-                throw new Exception();  //TODO: Write Custom Exceptions
-        }
-
-        public void StrikerStriked()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Play()
-        {
-            int caseType = -1;
-
-
-            do
-            {
-                Console.WriteLine(_striker.Name + " Choose from the list");
-                Console.WriteLine("1. STRIKE");
-                Console.WriteLine("2. MultiSTRIKE");
-                Console.WriteLine("3. Red STRIKE");
-                Console.WriteLine("4. Striker STRIKE");
-                Console.WriteLine("5. Defunct Coin");
-                Console.WriteLine("6. None");
-                Console.WriteLine("7. Exit");
-
-                caseType = Convert.ToInt32(Console.ReadLine());
-                Register(caseType);
-
-                if (IsFoul())
-                    RegisterScore((int)StrikeType.Foul);
-                if (IsConsecutiveNoStrike())
-                    RegisterScore((int)StrikeType.Consecutive_3_NoStrike);
-
-                if (GetWinner() != null)
-                    caseType = 7;
-
-                Print();
-            } while (!(IsGameOver() || caseType == 7));
-            if (IsGameDraw())
-                Console.WriteLine("Game DRAW!!...");
-            Print();
-        }
-
-        private void Register(int caseType)
-        {
-               switch (caseType)
-            {
-                case 1:
-                    Strikes(StrikeType.Strike);
-                    break;
-                case 2:
-                    Strikes(StrikeType.Multi_Strike);
-                    break;
-                case 3:
-                    Strikes(StrikeType.RedCoin_Strike);
-                    break;
-                case 4:
-                    Strikes(StrikeType.Striker_Strike);
-                    break;
-                case 5:
-                    Strikes(StrikeType.Defunt_Coin);
-                    break;
-                case 6:
-                    Strikes(StrikeType.No_Strike);
-                    break;
-            }
-        }
-
-        private void Strikes(StrikeType strikeType)
-        {
-            switch (strikeType)
-            {
-                case StrikeType.No_Strike:
-                    RegisterMove(strikeType);
-                    SwitchPlayer();
-                    break;
-                case StrikeType.Striker_Strike:
-                    RegisterMove(strikeType);
-                    SwitchPlayer();
-                    break;
-                case StrikeType.RedCoin_Strike:
-                    RegisterMove(strikeType);
-                    RedCoinStriked();
-                    SwitchPlayer();
-                    break;
-                case StrikeType.Strike:
-                    RegisterMove(strikeType);
-                    SwitchPlayer();
-                    break;
-                case StrikeType.Multi_Strike:
-                    RegisterMove(strikeType);
-                    SwitchPlayer();
-                    break;
-                case StrikeType.Defunt_Coin:
-                    RegisterMove(strikeType);
-                    CoinStriked();
-                    SwitchPlayer();
-                    break;
-            }
-
-            
-        }
+        #endregion
     }
 }

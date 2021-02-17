@@ -5,19 +5,16 @@ using System.Text;
 
 namespace CleanStrike.Interfaces
 {
+    /**
+     * All the methods requires for playing Carrom game resides here.
+     **/
+
     public interface IGame
     {
-        void Start();
-        void RegisterScore(int score);
-        bool IsConsecutiveNoStrike();
-        bool IsFoul();
         Player GetWinner();
         bool IsGameDraw();
         bool IsGameOver();
-        void RegisterMove(StrikeType strikeType);
         void SwitchPlayer();
-        void CoinStriked();
-        void StrikerStriked();
-        void RedCoinStriked();
+        void PlayGame(int strike);
       }
 }

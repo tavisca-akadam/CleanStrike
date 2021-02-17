@@ -7,19 +7,17 @@ namespace CleanStrike.Models
 {
     public class Player
     {
-        public Player(string name, bool isTurn)
+        /**
+         * Model Class representing single player.
+         **/
+        public Player(string name)
         {
             Name = name;
-            IsPlayTurn = isTurn;
         }
         public string Name { get; set; } = Guid.NewGuid().ToString();
-        public bool IsPlayTurn { get; set; } = false;
+        public bool Won { get; set; } = false;
         public int Score { get; set; } = 0;
 
         public List<StrikeType> StrikeHistory { get; set; } = new List<StrikeType>();
-        public void ChnageTurn()
-        {
-            this.IsPlayTurn = !this.IsPlayTurn;
-        }
     }
 }

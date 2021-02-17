@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.902
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanStrike.App", "CleanStrike.App\CleanStrike.App.csproj", "{E1460AA6-A263-4E09-BBBE-6C39DDD89EC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanStrike.App", "CleanStrike.App\CleanStrike.App.csproj", "{E1460AA6-A263-4E09-BBBE-6C39DDD89EC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanStrike", "CleanStrike\CleanStrike.csproj", "{51C9E568-FF14-4296-95BA-482FD4B75404}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanStrike", "CleanStrike\CleanStrike.csproj", "{51C9E568-FF14-4296-95BA-482FD4B75404}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanStrike.Tests", "CleanStrike.Tests\CleanStrike.Tests.csproj", "{85666926-CC41-45CD-BDC2-E401999AA185}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanStrike.Tests", "CleanStrike.Tests\CleanStrike.Tests.csproj", "{85666926-CC41-45CD-BDC2-E401999AA185}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
