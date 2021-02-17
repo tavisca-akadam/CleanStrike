@@ -17,10 +17,10 @@
 > Note: For Mac/Linux System please use / slash.
 `dotnet test CleanStrike.Tests/CleanStrike.Tests.csproj`
 
-### User Input
+### 5. User Input
 User input file stored in `CleanStrike.App\CleanStrike.App\Input` folder.
 
-### Framework - 
+### 6. Framework - 
 > requires - dotnet-core 2.1 framework
 > <br>
 > https://dotnet.microsoft.com/download/dotnet-core/2.1
