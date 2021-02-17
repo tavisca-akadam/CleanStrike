@@ -21,8 +21,8 @@ namespace CleanStrike
             _carromBoard = new CarromBoard(blackCoins, redCoins);
             _players = new List<Player>();
 
-            _players.Add(new Player("Ak"));
-            _players.Add(new Player("Anil"));
+            _players.Add(new Player("Playe1"));
+            _players.Add(new Player("Player2"));
 
             _currentPlayerIndex = 0;
             _action = new GameAction();
