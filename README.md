@@ -19,3 +19,8 @@
 
 ### User Input
 User input file stored in `CleanStrike.App\CleanStrike.App\Input` folder.
+
+### Framework - 
+> requires - dotnet-core 2.1 framework
+> <br>
+> https://dotnet.microsoft.com/download/dotnet-core/2.1
