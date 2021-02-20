@@ -2,6 +2,7 @@
 using CleanStrike.Interfaces;
 using CleanStrike.Models;
 using FluentAssertions;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,7 +16,8 @@ namespace CleanStrike.Tests
         [Fact]
         public void Check_game_is_draw_test()
         {
-            Game game = new Game(0, 0);
+            var game = GetGameObj();
+            game.InitBoard(0, 0);
 
             game.IsGameDraw().Should().Be(true);
         }
@@ -23,7 +25,8 @@ namespace CleanStrike.Tests
         [Fact]
         public void Check_game_is_over_test()
         {
-            Game game = new Game(0, 0);
+            var game = GetGameObj();
+            game.InitBoard(0, 0);
 
             var result = game.IsGameOver();
             result.Should().Be(true);
@@ -34,7 +37,9 @@ namespace CleanStrike.Tests
         {
             Player winner = null;
             int[] userInput = { 3, 1, 2, 2, 2, 1 };
-            Game game = new Game(9, 1);
+            var game = GetGameObj();
+            game.InitBoard(9, 1);
+
             foreach (var i in userInput)
             {
                 game.PlayGame(i);
@@ -50,7 +55,9 @@ namespace CleanStrike.Tests
         public void Check_game_is_over_using_input_test()
         {
             int[] userInput = { 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
-            Game game = new Game(9, 1);
+            var game = GetGameObj();
+            game.InitBoard(9, 1);
+
             foreach (var i in userInput)
             {
                 game.PlayGame(i);
@@ -65,7 +72,9 @@ namespace CleanStrike.Tests
         public void Validate_Coin_not_found_exception_test()
         {
             int[] userInput = { 3, 3 };
-            Game game = new Game(9, 1);
+
+            var game = GetGameObj();
+            game.InitBoard(9, 1);
             try
             {
                 foreach (var i in userInput)
@@ -77,6 +86,15 @@ namespace CleanStrike.Tests
             {
                 ex.GetType().Should().Be(typeof(CoinNotFoundException));
             }
+        }
+
+        private Game GetGameObj()
+        {
+            var mockGameAction = new Mock<IAction>();
+
+            var gameObj =  new Game(mockGameAction.Object);
+            
+            return gameObj;
         }
     }
 }

@@ -16,5 +16,7 @@ namespace CleanStrike.Interfaces
         bool IsGameOver();
         void SwitchPlayer();
         void PlayGame(int strike);
+        void InitBoard(int blackCoins, int redCoins);
+        void PrintScore();
       }
 }

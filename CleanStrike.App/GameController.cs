@@ -1,23 +1,34 @@
 ﻿using CleanStrike.Models;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using CleanStrike.Interfaces;
+using CleanStrike.App.Extensions;
 
 namespace CleanStrike.App
 {
     public class GameController
     {
-        static void Main(string[] args)
+        private readonly IAction _action;
+        private readonly IGame _game;
+        public GameController(IAction action, IGame game)
         {
-            try 
+            _action = action;
+            _game = game;
+        }
+        public void Play()
+        {
+            try
             {
                 var inputStraem = ReadInputFromFile();      //Reading from file.
                 int itr = 0;
                 var inputArr = inputStraem.Split(',');      //Spliting file input.
 
-                Game game = new Game(9, 1);
+                _game.InitBoard(9, 1);
                 int option = 7;
-                while(true)
+                while (true)
                 {
                     if (itr >= inputArr.Length)
                         break;
@@ -26,11 +37,11 @@ namespace CleanStrike.App
                     if (option >= 7)
                         break;
 
-                    game.PlayGame(option);
+                    _game.PlayGame(option);
 
-                    if (game.GetWinner() != null)
+                    if (_game.GetWinner() != null)
                         break;
-                    if (game.IsGameOver())
+                    if (_game.IsGameOver())
                     {
                         Console.WriteLine("Game Over...");
                         break;
@@ -38,16 +49,21 @@ namespace CleanStrike.App
                 }
 
 
-                game.PrintScore();
+                _game.PrintScore();
             }
-            catch(FileNotFoundException ex)
+            catch (FileNotFoundException ex)
             {
                 Console.WriteLine("Something went wrong. Play Terminated.");
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 Console.WriteLine("Invalid input. Play Terminated.");
             }
+        }
+        static void Main(string[] args)
+        {
+            var host = AppBuilder.CreateHostBuilder(args).Build();
+            host.Services.GetRequiredService<GameController>().Play();
         }
         
         /**
@@ -73,5 +89,7 @@ namespace CleanStrike.App
 
             return string.Empty;
         }      
+
+        
     }
 }

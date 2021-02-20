@@ -16,16 +16,20 @@ namespace CleanStrike
         private int _currentPlayerIndex;
         private IAction _action;
 
-        public Game(int blackCoins, int redCoins)
+        public Game(IAction action)
         {
-            _carromBoard = new CarromBoard(blackCoins, redCoins);
             _players = new List<Player>();
 
             _players.Add(new Player("Playe1"));
             _players.Add(new Player("Player2"));
 
             _currentPlayerIndex = 0;
-            _action = new GameAction();
+            _action = action;
+        }
+
+        public void InitBoard(int blackCoins, int redCoins)
+        {
+            _carromBoard = new CarromBoard(blackCoins, redCoins);
         }
 
         /*
