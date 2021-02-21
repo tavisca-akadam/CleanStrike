@@ -23,8 +23,10 @@ namespace CleanStrike.Tests
         {
             GameAction gameAction = new GameAction();
             Player player = new Player("p1");
+            Team testTeam = new Team("Test");
+            testTeam.Players.Add(player);
 
-            gameAction.AddPoints(player, ScoreMap.AssignedScore[strikeType]);
+            gameAction.AddPoints(testTeam, ScoreMap.AssignedScore[strikeType]);
             player.Score.Should().Be(expectedPoints);
         }
 
@@ -33,11 +35,13 @@ namespace CleanStrike.Tests
         {
             GameAction gameAction = new GameAction();
             Player player = new Player("p1");
+            Team testTeam = new Team("Test");
+            testTeam.Players.Add(player);
 
-            gameAction.AddPoints(player, ScoreMap.AssignedScore[StrikeType.RedCoin_Strike]);
-            gameAction.AddPoints(player, ScoreMap.AssignedScore[StrikeType.Multi_Strike]);
-            gameAction.AddPoints(player, ScoreMap.AssignedScore[StrikeType.Strike]);
-            gameAction.AddPoints(player, ScoreMap.AssignedScore[StrikeType.Defunt_Coin]);
+            gameAction.AddPoints(testTeam, ScoreMap.AssignedScore[StrikeType.RedCoin_Strike]);
+            gameAction.AddPoints(testTeam, ScoreMap.AssignedScore[StrikeType.Multi_Strike]);
+            gameAction.AddPoints(testTeam, ScoreMap.AssignedScore[StrikeType.Strike]);
+            gameAction.AddPoints(testTeam, ScoreMap.AssignedScore[StrikeType.Defunt_Coin]);
 
             player.Score.Should().Be(4);
         }
@@ -55,8 +59,10 @@ namespace CleanStrike.Tests
         {
             GameAction gameAction = new GameAction();
             Player player = new Player("p1");
+            Team testTeam = new Team("Test");
+            testTeam.Players.Add(player);
 
-            gameAction.RegisterAction(player, strikeType);
+            gameAction.RegisterAction(testTeam, strikeType);
             player.StrikeHistory.First().Should().Be(strikeType);
         }
 
@@ -65,11 +71,13 @@ namespace CleanStrike.Tests
         {
             GameAction gameAction = new GameAction();
             Player player = new Player("p1");
+            Team testTeam = new Team("Test");
+            testTeam.Players.Add(player);
 
-            gameAction.RegisterAction(player, StrikeType.RedCoin_Strike);
-            gameAction.RegisterAction(player, StrikeType.Multi_Strike);
-            gameAction.RegisterAction(player, StrikeType.Strike);
-            gameAction.RegisterAction(player, StrikeType.Defunt_Coin);
+            gameAction.RegisterAction(testTeam, StrikeType.RedCoin_Strike);
+            gameAction.RegisterAction(testTeam, StrikeType.Multi_Strike);
+            gameAction.RegisterAction(testTeam, StrikeType.Strike);
+            gameAction.RegisterAction(testTeam, StrikeType.Defunt_Coin);
 
             player.StrikeHistory.Count.Should().Be(4);
             player.StrikeHistory.First().Should().Be(StrikeType.RedCoin_Strike);
@@ -81,12 +89,14 @@ namespace CleanStrike.Tests
         {
             GameAction gameAction = new GameAction();
             Player player = new Player("p1");
+            Team testTeam = new Team("Test");
+            testTeam.Players.Add(player);
 
-            gameAction.RegisterAction(player, StrikeType.Striker_Strike);
-            gameAction.RegisterAction(player, StrikeType.Defunt_Coin);
-            gameAction.RegisterAction(player, StrikeType.Striker_Strike);
+            gameAction.RegisterAction(testTeam, StrikeType.Striker_Strike);
+            gameAction.RegisterAction(testTeam, StrikeType.Defunt_Coin);
+            gameAction.RegisterAction(testTeam, StrikeType.Striker_Strike);
 
-            gameAction.CheckFoul(player).Should().BeTrue();
+            gameAction.CheckFoul(testTeam).Should().BeTrue();
         }
 
         [Fact]
@@ -94,12 +104,14 @@ namespace CleanStrike.Tests
         {
             GameAction gameAction = new GameAction();
             Player player = new Player("p1");
+            Team testTeam = new Team("Test");
+            testTeam.Players.Add(player);
 
-            gameAction.RegisterAction(player, StrikeType.No_Strike);
-            gameAction.RegisterAction(player, StrikeType.No_Strike);
-            gameAction.RegisterAction(player, StrikeType.No_Strike);
+            gameAction.RegisterAction(testTeam, StrikeType.No_Strike);
+            gameAction.RegisterAction(testTeam, StrikeType.No_Strike);
+            gameAction.RegisterAction(testTeam, StrikeType.No_Strike);
 
-            gameAction.CheckConsecutiveNoStrike(player).Should().BeTrue();
+            gameAction.CheckConsecutiveNoStrike(testTeam).Should().BeTrue();
         }
 
         [Fact]

@@ -18,9 +18,9 @@ namespace CleanStrike
         /**
          * Helper Method to check if consecutive three no strike move played by same player.
          **/
-        public bool CheckConsecutiveNoStrike(Player player)
+        public bool CheckConsecutiveNoStrike(Team team)
         {
-            var playingHistory = player.StrikeHistory;
+            var playingHistory = team.PlayingHistory;
             bool isConsecutive3NoStrikes = false;
             int count = playingHistory.Count;
             int index = (count - KeyStore.GameSettings.Consecutive_No_Strike_Limit);
@@ -44,16 +44,16 @@ namespace CleanStrike
         /**
          * Helper method check whether Foul or not.
          **/
-        public bool CheckFoul(Player player)
+        public bool CheckFoul(Team team)
         {
-            var playingHistory = player.StrikeHistory;
+            var playingHistory = team.PlayingHistory;
             bool isFoul = false;
             int count = playingHistory.Count;
             int index = (count - KeyStore.GameSettings.Consecutive_Loosing_Limit);
 
             if (count >= KeyStore.GameSettings.Consecutive_Loosing_Limit)
             {
-                bool isThreeNoStrike = CheckConsecutiveNoStrike(player);
+                bool isThreeNoStrike = CheckConsecutiveNoStrike(team);
                 isFoul = true;
                 while (index < count)
                 {
@@ -95,16 +95,21 @@ namespace CleanStrike
         /**
          * Method Register move for given player.
          **/
-        public void RegisterAction(Player player, StrikeType strikeType)
+        public void RegisterAction(Team team, StrikeType strikeType)
         {
-            player.StrikeHistory.Add(strikeType);
+            team.PlayingHistory.Add(strikeType);
+            team.Players[team.CurrentPlayerIndex].StrikeHistory.Add(strikeType);
             gameHistory.Add(strikeType);
         }
-        
+
         /**
          * Method increase/decrease player's score.
          **/
-        public void AddPoints(Player player, int points) => player.Score += points;
+        public void AddPoints(Team team, int points)
+        {
+            team.TotalScore += points;
+            team.Players[team.CurrentPlayerIndex].Score += points;
+        }
 
         #region Private Methods
         /**

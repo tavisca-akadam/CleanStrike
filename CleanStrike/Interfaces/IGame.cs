@@ -11,7 +11,7 @@ namespace CleanStrike.Interfaces
 
     public interface IGame
     {
-        Player GetWinner();
+        Team GetWinner();
         bool IsGameDraw();
         bool IsGameOver();
         void SwitchPlayer();
