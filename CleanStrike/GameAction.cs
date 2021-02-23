@@ -20,25 +20,9 @@ namespace CleanStrike
          **/
         public bool CheckConsecutiveNoStrike(Player player)
         {
-            var playingHistory = player.StrikeHistory;
-            bool isConsecutive3NoStrikes = false;
-            int count = playingHistory.Count;
-            int index = (count - KeyStore.GameSettings.Consecutive_No_Strike_Limit);
-
-            if (count >= KeyStore.GameSettings.Consecutive_No_Strike_Limit)
-            {
-                isConsecutive3NoStrikes = true;
-                while (index < count)
-                {
-                    if (!(playingHistory[index] == StrikeType.No_Strike))
-                    {
-                        isConsecutive3NoStrikes = false;
-                        break;
-                    }
-                    index++;
-                }
-            }
-            return isConsecutive3NoStrikes;
+            if (player.NoStrikeCount >= KeyStore.GameSettings.Consecutive_No_Strike_Limit)
+                return true;
+            return false;
         }
 
         /**
@@ -46,26 +30,9 @@ namespace CleanStrike
          **/
         public bool CheckFoul(Player player)
         {
-            var playingHistory = player.StrikeHistory;
-            bool isFoul = false;
-            int count = playingHistory.Count;
-            int index = (count - KeyStore.GameSettings.Consecutive_Loosing_Limit);
-
-            if (count >= KeyStore.GameSettings.Consecutive_Loosing_Limit)
-            {
-                bool isThreeNoStrike = CheckConsecutiveNoStrike(player);
-                isFoul = true;
-                while (index < count)
-                {
-                    if (!(IsLoosingPoint(playingHistory[index]) || isThreeNoStrike))
-                    {
-                        isFoul = false;
-                        break;
-                    }
-                    index++;
-                }
-            }
-            return isFoul;
+            if (player.FoulCount >= KeyStore.GameSettings.Consecutive_Loosing_Limit)
+                return true;
+            return false;
         }
 
         /**
@@ -98,9 +65,11 @@ namespace CleanStrike
         public void RegisterAction(Player player, StrikeType strikeType)
         {
             player.StrikeHistory.Add(strikeType);
+            SetNoStrikeMoveCount(strikeType, player);
+            SetFoulMoveCount(strikeType, player);
             gameHistory.Add(strikeType);
         }
-        
+
         /**
          * Method increase/decrease player's score.
          **/
@@ -114,6 +83,22 @@ namespace CleanStrike
         {
             return ((strikeType == StrikeType.Defunt_Coin) ||
                 (strikeType == StrikeType.Striker_Strike));
+        }
+
+        /**
+         * Handler method set NoStrikeCount property according to striker's move.
+         **/
+        private void SetNoStrikeMoveCount(StrikeType strikeType, Player player)
+        {
+            player.NoStrikeCount = strikeType == StrikeType.No_Strike ? player.NoStrikeCount + 1 : 0;
+        }
+
+        /**
+         * Handler method set FoulCount property according to striker's move.
+         **/
+        private void SetFoulMoveCount(StrikeType strikeType, Player player)
+        {
+            player.FoulCount = (IsLoosingPoint(strikeType) || CheckConsecutiveNoStrike(player)) ? player.FoulCount + 1 : 0;
         }
         #endregion
     }
