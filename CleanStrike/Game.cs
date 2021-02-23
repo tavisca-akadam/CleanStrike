@@ -93,25 +93,24 @@ namespace CleanStrike
                 switch (strikeType)
                 {  
                     case 1:
-                        PassStriker(StrikeType.Strike, ScoreMap.AssignedScore[StrikeType.Strike]);
+                        MakeMove(StrikeType.Strike, ScoreMap.AssignedScore[StrikeType.Strike]);
                         break;
                     case 2:
-                        PassStriker(StrikeType.Multi_Strike, ScoreMap.AssignedScore[StrikeType.Multi_Strike]);
+                        MakeMove(StrikeType.Multi_Strike, ScoreMap.AssignedScore[StrikeType.Multi_Strike]);
                         break;
                     case 3:
-                        PassStriker(StrikeType.RedCoin_Strike, ScoreMap.AssignedScore[StrikeType.RedCoin_Strike]);
+                        MakeMove(StrikeType.RedCoin_Strike, ScoreMap.AssignedScore[StrikeType.RedCoin_Strike]);
                         _action.OnRedCoinPocketed(_carromBoard);
                         break;
                     case 4:
-                        PassStriker(StrikeType.Striker_Strike, ScoreMap.AssignedScore[StrikeType.Striker_Strike]);
+                        MakeMove(StrikeType.Striker_Strike, ScoreMap.AssignedScore[StrikeType.Striker_Strike]);
                         break;
                     case 5:
-                        PassStriker(StrikeType.Defunt_Coin, ScoreMap.AssignedScore[StrikeType.Defunt_Coin]);
+                        MakeMove(StrikeType.Defunt_Coin, ScoreMap.AssignedScore[StrikeType.Defunt_Coin]);
                         _action.OnCoinStriked(_carromBoard);
                         break;
                     case 6:
-                        _action.RegisterAction(_players[_currentPlayerIndex], StrikeType.No_Strike);
-                        SwitchPlayer();
+                        MakeMove(StrikeType.No_Strike, ScoreMap.AssignedScore[StrikeType.No_Strike]);
                         break;
 
                 }
@@ -119,15 +118,16 @@ namespace CleanStrike
                     _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.AssignedScore[StrikeType.Foul]);
                 if (_action.CheckConsecutiveNoStrike(_players[_currentPlayerIndex]))
                     _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.AssignedScore[StrikeType.Consecutive_3_NoStrike]);
+
+               SwitchPlayer();
         }
 
         #region private methods
         // This method will register the move and pass the striker to next player.
-        private void PassStriker(StrikeType strikeType, int value)
+        private void MakeMove(StrikeType strikeType, int value)
         {
             _action.RegisterAction(_players[_currentPlayerIndex], strikeType);
             _action.AddPoints(_players[_currentPlayerIndex], value);
-            SwitchPlayer();
         }
 
         //Method that decides if player is winner from player list
