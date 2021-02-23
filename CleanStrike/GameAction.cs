@@ -65,8 +65,8 @@ namespace CleanStrike
         public void RegisterAction(Player player, StrikeType strikeType)
         {
             player.StrikeHistory.Add(strikeType);
-            IsNoStrikeMove(strikeType, player);
-            IsFoulMove(strikeType, player);
+            SetNoStrikeMoveCount(strikeType, player);
+            SetFoulMoveCount(strikeType, player);
             gameHistory.Add(strikeType);
         }
 
@@ -88,23 +88,17 @@ namespace CleanStrike
         /**
          * Handler method set NoStrikeCount property according to striker's move.
          **/
-        private void IsNoStrikeMove(StrikeType strikeType, Player player)
+        private void SetNoStrikeMoveCount(StrikeType strikeType, Player player)
         {
-            if (strikeType == StrikeType.No_Strike)
-                player.NoStrikeCount++;
-            else
-                player.NoStrikeCount = 0;
+            player.NoStrikeCount = strikeType == StrikeType.No_Strike ? player.NoStrikeCount + 1 : 0;
         }
 
         /**
          * Handler method set FoulCount property according to striker's move.
          **/
-        private void IsFoulMove(StrikeType strikeType, Player player)
+        private void SetFoulMoveCount(StrikeType strikeType, Player player)
         {
-            if (IsLoosingPoint(strikeType) || CheckConsecutiveNoStrike(player))
-                player.FoulCount++;
-            else
-                player.FoulCount = 0;
+            player.FoulCount = (IsLoosingPoint(strikeType) || CheckConsecutiveNoStrike(player)) ? player.FoulCount + 1 : 0;
         }
         #endregion
     }
