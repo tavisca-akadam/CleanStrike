@@ -19,7 +19,5 @@ namespace CleanStrike.Models
         public int Score { get; set; } = 0;
 
         public List<StrikeType> StrikeHistory { get; set; } = new List<StrikeType>();
-        public int FoulCount { get; set; } = 0;
-        public int NoStrikeCount { get; set; } = 0;
     }
 }

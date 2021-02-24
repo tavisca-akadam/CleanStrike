@@ -1,41 +1,47 @@
-﻿using CleanStrike.Exceptions;
-using CleanStrike.Interfaces;
+﻿using CleanStrike.Interfaces;
 using CleanStrike.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CleanStrike
 {
     public class Game : IGame
     {
         private CarromBoard _carromBoard;
-
-        private List<Player> _players;
-
-        private int _currentPlayerIndex;
+        private List<Team> _teams;
+        private int _currentTeamIndex;
         private IAction _action;
 
         public Game(int blackCoins, int redCoins)
         {
             _carromBoard = new CarromBoard(blackCoins, redCoins);
-            _players = new List<Player>();
+            _teams = new List<Team>();
 
-            _players.Add(new Player("Playe1"));
-            _players.Add(new Player("Player2"));
+            // Register Teams 
+            _teams.Add(new Team("Rangers"));
+            _teams.Add(new Team("Blasters"));
 
-            _currentPlayerIndex = 0;
+            // Register Team Players
+            _teams[0].Players.Add(new Player("Playe1"));
+            _teams[0].Players.Add(new Player("Playe3"));
+
+            _teams[1].Players.Add(new Player("Playe2"));
+            _teams[1].Players.Add(new Player("Playe4"));
+
+            // Initialize current index as 0, so first team1 approach first.
+            _currentTeamIndex = 0;
+
             _action = new GameAction();
         }
 
         /*
          * Helper method to return game final winner of game.
          **/
-        public Player GetWinner()
+        public Team GetWinner()
         {
-            for(int itr = 0; itr < _players.Count; itr++) {
-                if(IsPlayerWinner(itr))
-                    return _players[itr];
+            for(int itr = 0; itr < _teams.Count; itr++) {
+                if(IsTeamWinner(itr))
+                    return _teams[itr];
             }
             return null;
         }
@@ -63,15 +69,15 @@ namespace CleanStrike
          **/
         public void PrintScore()
         {
-            Player winner = GetWinner();
+            Team winner = GetWinner();
             if (winner != null)
             {
                 Console.Write($"{winner.Name} won the game. ");
             }
             Console.WriteLine("Final Score:");
-            for (int itr = 0; itr < _players.Count; itr++)
+            for (int itr = 0; itr < _teams.Count; itr++)
             {
-                Console.WriteLine($"{_players[itr].Name} : {_players[itr].Score}.");
+                Console.WriteLine($"{_teams[itr].Name} : {_teams[itr].TotalScore}.");
             } 
         }
 
@@ -80,8 +86,10 @@ namespace CleanStrike
          **/
         public void SwitchPlayer()
         {
-            _currentPlayerIndex++;
-            _currentPlayerIndex %= _players.Count;
+            _teams[_currentTeamIndex].CurrentPlayerIndex++;
+            _teams[_currentTeamIndex].CurrentPlayerIndex %= _teams[_currentTeamIndex].Players.Count;
+            _currentTeamIndex++;
+            _currentTeamIndex %= _teams.Count;
         }
 
         /**
@@ -114,10 +122,10 @@ namespace CleanStrike
                         break;
 
                 }
-                if (_action.CheckFoul(_players[_currentPlayerIndex]))
-                    _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.AssignedScore[StrikeType.Foul]);
-                if (_action.CheckConsecutiveNoStrike(_players[_currentPlayerIndex]))
-                    _action.AddPoints(_players[_currentPlayerIndex], ScoreMap.AssignedScore[StrikeType.Consecutive_3_NoStrike]);
+                if (_action.CheckFoul(_teams[_currentTeamIndex]))
+                    _action.AddPoints(_teams[_currentTeamIndex], ScoreMap.AssignedScore[StrikeType.Foul]);
+                if (_action.CheckConsecutiveNoStrike(_teams[_currentTeamIndex]))
+                    _action.AddPoints(_teams[_currentTeamIndex], ScoreMap.AssignedScore[StrikeType.Consecutive_3_NoStrike]);
 
                SwitchPlayer();
         }
@@ -126,17 +134,17 @@ namespace CleanStrike
         // This method will register the move and pass the striker to next player.
         private void MakeMove(StrikeType strikeType, int value)
         {
-            _action.RegisterAction(_players[_currentPlayerIndex], strikeType);
-            _action.AddPoints(_players[_currentPlayerIndex], value);
+            _action.RegisterAction(_teams[_currentTeamIndex], strikeType);
+            _action.AddPoints(_teams[_currentTeamIndex], value);
         }
 
         //Method that decides if player is winner from player list
-        private bool IsPlayerWinner(int index) {
-            if(_players[index].Score < KeyStore.GameSettings.Min_Winining_Points)
+        private bool IsTeamWinner(int index) {
+            if(_teams[index].TotalScore < KeyStore.GameSettings.Min_Winining_Points)
                 return false;
-            for(int itr = 0; itr < _players.Count; itr++) {
+            for(int itr = 0; itr < _teams.Count; itr++) {
                 if(index != itr) {
-                    if(_players[index].Score - _players[itr].Score < KeyStore.GameSettings.Min_Win_Point_Diff)
+                    if(_teams[index].TotalScore - _teams[itr].TotalScore < KeyStore.GameSettings.Min_Win_Point_Diff)
                         return false;
                 }
             }

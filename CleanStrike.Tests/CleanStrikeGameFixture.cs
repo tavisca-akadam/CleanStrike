@@ -32,7 +32,7 @@ namespace CleanStrike.Tests
         [Fact]
         public void GetWinner_test()
         {
-            Player winner = null;
+            Team winner = null;
             int[] userInput = { 3, 1, 2, 2, 2, 1 };
             Game game = new Game(9, 1);
             foreach (var i in userInput)
