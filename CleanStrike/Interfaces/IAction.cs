@@ -1,7 +1,4 @@
 ﻿using CleanStrike.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CleanStrike.Interfaces
 {
@@ -11,11 +8,11 @@ namespace CleanStrike.Interfaces
 
     public interface IAction
     {
-        void RegisterAction(Player player, StrikeType strikeType);
+        void RegisterAction(Team team, StrikeType strikeType);
         void OnCoinStriked(CarromBoard board);
         void OnRedCoinPocketed(CarromBoard board);
-        bool CheckFoul(Player player);
-        bool CheckConsecutiveNoStrike(Player player);
-        void AddPoints(Player player, int point);
+        bool CheckFoul(Team team);
+        bool CheckConsecutiveNoStrike(Team team);
+        void AddPoints(Team team, int point);
     }
 }

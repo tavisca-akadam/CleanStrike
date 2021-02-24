@@ -1,9 +1,7 @@
 ﻿using CleanStrike.Exceptions;
 using CleanStrike.Interfaces;
 using CleanStrike.Models;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CleanStrike
 {
@@ -18,54 +16,21 @@ namespace CleanStrike
         /**
          * Helper Method to check if consecutive three no strike move played by same player.
          **/
-        public bool CheckConsecutiveNoStrike(Player player)
+        public bool CheckConsecutiveNoStrike(Team team)
         {
-            var playingHistory = player.StrikeHistory;
-            bool isConsecutive3NoStrikes = false;
-            int count = playingHistory.Count;
-            int index = (count - KeyStore.GameSettings.Consecutive_No_Strike_Limit);
-
-            if (count >= KeyStore.GameSettings.Consecutive_No_Strike_Limit)
-            {
-                isConsecutive3NoStrikes = true;
-                while (index < count)
-                {
-                    if (!(playingHistory[index] == StrikeType.No_Strike))
-                    {
-                        isConsecutive3NoStrikes = false;
-                        break;
-                    }
-                    index++;
-                }
-            }
-            return isConsecutive3NoStrikes;
+            if (team.NoStrikeCount >= KeyStore.GameSettings.Consecutive_No_Strike_Limit)
+                return true;
+            return false;
         }
 
         /**
          * Helper method check whether Foul or not.
          **/
-        public bool CheckFoul(Player player)
+        public bool CheckFoul(Team team)
         {
-            var playingHistory = player.StrikeHistory;
-            bool isFoul = false;
-            int count = playingHistory.Count;
-            int index = (count - KeyStore.GameSettings.Consecutive_Loosing_Limit);
-
-            if (count >= KeyStore.GameSettings.Consecutive_Loosing_Limit)
-            {
-                bool isThreeNoStrike = CheckConsecutiveNoStrike(player);
-                isFoul = true;
-                while (index < count)
-                {
-                    if (!(IsLoosingPoint(playingHistory[index]) || isThreeNoStrike))
-                    {
-                        isFoul = false;
-                        break;
-                    }
-                    index++;
-                }
-            }
-            return isFoul;
+            if (team.FoulCount >= KeyStore.GameSettings.Consecutive_Loosing_Limit)
+                return true;
+            return false;
         }
 
         /**
@@ -95,16 +60,23 @@ namespace CleanStrike
         /**
          * Method Register move for given player.
          **/
-        public void RegisterAction(Player player, StrikeType strikeType)
+        public void RegisterAction(Team team, StrikeType strikeType)
         {
-            player.StrikeHistory.Add(strikeType);
+            team.PlayHistory.Add(strikeType);
+            team.Players[team.CurrentPlayerIndex].StrikeHistory.Add(strikeType);
+            SetNoStrikeMoveCount(strikeType, team);
+            SetFoulMoveCount(strikeType, team);
             gameHistory.Add(strikeType);
         }
-        
+
         /**
          * Method increase/decrease player's score.
          **/
-        public void AddPoints(Player player, int points) => player.Score += points;
+        public void AddPoints(Team team, int points) 
+        {
+            team.TotalScore += points;
+            team.Players[team.CurrentPlayerIndex].Score += points;
+        }
 
         #region Private Methods
         /**
@@ -114,6 +86,22 @@ namespace CleanStrike
         {
             return ((strikeType == StrikeType.Defunt_Coin) ||
                 (strikeType == StrikeType.Striker_Strike));
+        }
+
+        /**
+         * Handler method set NoStrikeCount property according to striker's move.
+         **/
+        private void SetNoStrikeMoveCount(StrikeType strikeType, Team team)
+        {
+            team.NoStrikeCount = (strikeType == StrikeType.No_Strike) ? team.NoStrikeCount + 1 : 0;
+        }
+
+        /**
+         * Handler method set FoulCount property according to striker's move.
+         **/
+        private void SetFoulMoveCount(StrikeType strikeType, Team team)
+        {
+            team.FoulCount = (IsLoosingPoint(strikeType) || CheckConsecutiveNoStrike(team)) ? team.FoulCount + 1 : 0;
         }
         #endregion
     }
