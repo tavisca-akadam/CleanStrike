@@ -1,9 +1,7 @@
 ﻿using CleanStrike.Exceptions;
 using CleanStrike.Interfaces;
 using CleanStrike.Models;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CleanStrike
 {
